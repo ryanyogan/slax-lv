@@ -1,17 +1,17 @@
 defmodule SlaxWeb.ChatRoomLive do
   use SlaxWeb, :live_view
 
+  import SlaxWeb.Components.RoomComponents
+
   alias Slax.Repo
   alias Slax.Chat.Room
 
   @impl true
   def mount(_params, _session, socket) do
-    room =
-      Room
-      |> Repo.all()
-      |> hd()
+    rooms = Repo.all(Room)
+    room = rooms |> hd()
 
-    {:ok, assign(socket, room: room, hide_topic?: false)}
+    {:ok, assign(socket, room: room, rooms: rooms, hide_topic?: false)}
   end
 
   @impl true
