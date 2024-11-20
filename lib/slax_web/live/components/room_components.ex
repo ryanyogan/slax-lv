@@ -2,11 +2,11 @@ defmodule SlaxWeb.Components.RoomComponents do
   use SlaxWeb, :live_component
 
   alias Slax.Chat.{Room, Message}
+  alias Slax.Accounts.User
 
   attr :active, :boolean, required: true
   attr :room, Room, required: true
 
-  @spec room_link(map()) :: Phoenix.LiveView.Rendered.t()
   def room_link(assigns) do
     ~H"""
     <.link
@@ -33,12 +33,17 @@ defmodule SlaxWeb.Components.RoomComponents do
       <div class="ml-2">
         <div class="-mt-1">
           <.link class="text-sm font-semibold hover:underline">
-            <span>User</span>
+            <span><%= username(@message.user) %></span>
           </.link>
           <p class="text-sm"><%= @message.body %></p>
         </div>
       </div>
     </div>
     """
+  end
+
+  # TODO: Move this to a shared module
+  defp username(%User{} = user) do
+    user.email |> String.split("@") |> hd() |> String.capitalize()
   end
 end
