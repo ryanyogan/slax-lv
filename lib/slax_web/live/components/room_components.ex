@@ -14,7 +14,7 @@ defmodule SlaxWeb.Components.RoomComponents do
         "flex items-center h-8 text-sm pl-8 pr-3",
         (@active && "bg-slate-300") || "hover:bg-slate-300"
       ]}
-      href="#"
+      href={~p"/rooms/#{@room}"}
     >
       <.icon name="hero-hashtag" class="size-4" />
       <span class={["ml-2 leading-none", @active && "font-bold"]}>
