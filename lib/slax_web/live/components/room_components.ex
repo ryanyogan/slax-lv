@@ -57,6 +57,24 @@ defmodule SlaxWeb.Components.RoomComponents do
     """
   end
 
+  attr :user, User, required: true
+  attr :online, :boolean, default: false
+
+  def user(assigns) do
+    ~H"""
+    <.link class="flex items-center h-8 hover:bg-gray-300 text-sm pl-8 pr-3" href="#">
+      <div class="flex justify-center w-4">
+        <%= if @online do %>
+          <span class="size-2 rounded-full bg-blue-500"></span>
+        <% else %>
+          <span class="size-2 rounded-full border-gray-500 border-2"></span>
+        <% end %>
+      </div>
+      <span class="ml-2 leading-none"><%= username(@user) %></span>
+    </.link>
+    """
+  end
+
   # TODO: Move this to a shared module
   defp username(%User{} = user) do
     user.email |> String.split("@") |> hd() |> String.capitalize()

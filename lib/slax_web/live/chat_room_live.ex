@@ -3,15 +3,30 @@ defmodule SlaxWeb.ChatRoomLive do
 
   import SlaxWeb.Components.RoomComponents
 
+  alias Slax.Accounts
   alias Slax.Chat
   alias Slax.Chat.Message
+  alias SlaxWeb.OnlineUsers
 
   @impl true
   def mount(_params, _session, socket) do
     rooms = Chat.list_rooms()
+    users = Accounts.list_users()
+
     timezone = get_connect_params(socket)["timezone"]
 
-    {:ok, assign(socket, rooms: rooms, timezone: timezone)}
+    if connected?(socket) do
+      OnlineUsers.track(self(), socket.assigns.current_user)
+    end
+
+    OnlineUsers.subscribe()
+
+    socket =
+      socket
+      |> assign(rooms: rooms, timezone: timezone, users: users)
+      |> assign(online_users: OnlineUsers.list())
+
+    {:ok, socket}
   end
 
   @impl true
@@ -90,6 +105,13 @@ defmodule SlaxWeb.ChatRoomLive do
   @impl true
   def handle_info({:message_deleted, message}, socket) do
     {:noreply, stream_delete(socket, :messages, message)}
+  end
+
+  @impl true
+  def handle_info(%{event: "presence_diff", payload: diff}, socket) do
+    online_users = OnlineUsers.update(socket.assigns.online_users, diff)
+
+    {:noreply, assign(socket, online_users: online_users)}
   end
 
   defp assign_message_form(socket, changeset) do
