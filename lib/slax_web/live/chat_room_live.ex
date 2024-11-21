@@ -9,8 +9,9 @@ defmodule SlaxWeb.ChatRoomLive do
   @impl true
   def mount(_params, _session, socket) do
     rooms = Chat.list_rooms()
+    timezone = get_connect_params(socket)["timezone"]
 
-    {:ok, assign(socket, rooms: rooms)}
+    {:ok, assign(socket, rooms: rooms, timezone: timezone)}
   end
 
   @impl true

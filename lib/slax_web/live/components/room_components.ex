@@ -26,6 +26,7 @@ defmodule SlaxWeb.Components.RoomComponents do
 
   attr :message, Message, required: true
   attr :dom_id, :string, required: true
+  attr :timezone, :string, required: true
 
   def message(assigns) do
     ~H"""
@@ -36,7 +37,9 @@ defmodule SlaxWeb.Components.RoomComponents do
           <.link class="text-sm font-semibold hover:underline">
             <span><%= username(@message.user) %></span>
           </.link>
-          <span class="ml-1 text-xs text-gray-500"><%= message_timestamp(@message) %></span>
+          <span :if={@timezone} class="ml-1 text-xs text-gray-500">
+            <%= message_timestamp(@message, @timezone) %>
+          </span>
           <p class="text-sm"><%= @message.body %></p>
         </div>
       </div>
@@ -49,8 +52,9 @@ defmodule SlaxWeb.Components.RoomComponents do
     user.email |> String.split("@") |> hd() |> String.capitalize()
   end
 
-  defp message_timestamp(message) do
+  defp message_timestamp(message, timezone) do
     message.inserted_at
+    |> Timex.Timezone.convert(timezone)
     |> Timex.format!("%-l:%M %p", :strftime)
   end
 end
