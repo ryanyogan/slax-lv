@@ -4,6 +4,8 @@ defmodule Slax.Chat do
 
   import Ecto.Query
 
+  ### Rooms ###
+
   @spec get_first_room!() :: Room.t()
   def get_first_room! do
     Repo.one!(from r in Room, limit: 1, order_by: [asc: :name])
@@ -36,6 +38,21 @@ defmodule Slax.Chat do
     room
     |> Room.changeset(attrs)
     |> Repo.update()
+  end
+
+  ### Messages ###
+
+  @spec change_message(Message.t(), map()) :: Ecto.Changeset.t()
+  def change_message(message, attrs \\ %{}) do
+    Message.changeset(message, attrs)
+  end
+
+  @spec create_message(Room.t(), map(), User.t()) ::
+          {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
+  def create_message(room, attrs, user) do
+    %Message{room: room, user: user}
+    |> Message.changeset(attrs)
+    |> Repo.insert()
   end
 
   @spec list_messages_in_room(Room.t()) :: [Message.t()]
