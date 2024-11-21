@@ -73,7 +73,12 @@
     </ul>
   </div>
 
-  <div class="flex flex-col flex-grow overflow-auto" id="room-messages" phx-update="stream">
+  <div
+    class="flex flex-col flex-grow overflow-auto"
+    id="room-messages"
+    phx-update="stream"
+    phx-hook="RoomMessages"
+  >
     <.message
       :for={{dom_id, message} <- @streams.messages}
       message={message}
@@ -99,6 +104,7 @@
         placeholder={"Message ##{@room.name}"}
         rows="1"
         phx-debounce
+        phx-hook="ChatMessageTextarea"
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @new_message_form[:body].value) %></textarea>
 
       <button class="flex-shrink flex items-center justify-center size-6 rounded hover:bg-slate-200">
