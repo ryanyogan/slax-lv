@@ -25,10 +25,11 @@ defmodule SlaxWeb.Components.RoomComponents do
   end
 
   attr :message, Message, required: true
+  attr :dom_id, :string, required: true
 
   def message(assigns) do
     ~H"""
-    <div class="relative flex px-4 py-3">
+    <div id={@dom_id} class="relative flex px-4 py-3">
       <div class="size-10 rounded flex-shrink-0 bg-slate-300"></div>
       <div class="ml-2">
         <div class="-mt-1">

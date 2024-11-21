@@ -31,9 +31,9 @@ defmodule SlaxWeb.ChatRoomLive do
      |> assign(
        hide_topic?: false,
        room: room,
-       page_title: "#" <> room.name,
-       messages: messages
+       page_title: "#" <> room.name
      )
+     |> stream(:messages, messages, reset: true)
      |> assign_message_form(Chat.change_message(%Message{}))}
   end
 
@@ -57,7 +57,7 @@ defmodule SlaxWeb.ChatRoomLive do
       case Chat.create_message(room, message_params, current_user) do
         {:ok, message} ->
           socket
-          |> update(:messages, &(&1 ++ [message]))
+          |> stream_insert(:messages, message)
           |> assign_message_form(Chat.change_message(%Message{}))
 
         {:error, changeset} ->
