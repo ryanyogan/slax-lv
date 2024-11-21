@@ -27,10 +27,20 @@ defmodule SlaxWeb.Components.RoomComponents do
   attr :message, Message, required: true
   attr :dom_id, :string, required: true
   attr :timezone, :string, required: true
+  attr :current_user, User, required: true
 
   def message(assigns) do
     ~H"""
     <div id={@dom_id} class="relative flex px-4 py-3">
+      <button
+        :if={@current_user.id == @message.user_id}
+        data-confirm="Are you sure?"
+        phx-click="delete-message"
+        phx-value-id={@message.id}
+        class="absolute top-4 right-4 text-red-500 hover:text-red-800 cursor-pointer"
+      >
+        <.icon name="hero-trash" class="size-4" />
+      </button>
       <div class="size-10 rounded flex-shrink-0 bg-slate-300"></div>
       <div class="ml-2">
         <div class="-mt-1">

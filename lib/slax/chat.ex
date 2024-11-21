@@ -1,4 +1,5 @@
 defmodule Slax.Chat do
+  alias Slax.Accounts.User
   alias Slax.Chat.{Room, Message}
   alias Slax.Repo
 
@@ -53,6 +54,13 @@ defmodule Slax.Chat do
     %Message{room: room, user: user}
     |> Message.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @spec delete_message_by_id(integer(), User.t()) :: :ok
+  def delete_message_by_id(id, %User{id: user_id}) do
+    message = %Message{user_id: ^user_id} = Repo.get(Message, id)
+
+    Repo.delete(message)
   end
 
   @spec list_messages_in_room(Room.t()) :: [Message.t()]

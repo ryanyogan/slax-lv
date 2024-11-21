@@ -68,6 +68,13 @@ defmodule SlaxWeb.ChatRoomLive do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_event("delete-message", %{"id" => id}, socket) do
+    {:ok, message} = Chat.delete_message_by_id(id, socket.assigns.current_user)
+
+    {:noreply, stream_delete(socket, :messages, message)}
+  end
+
   defp assign_message_form(socket, changeset) do
     assign(socket, :new_message_form, to_form(changeset))
   end
