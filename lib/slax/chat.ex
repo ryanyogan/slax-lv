@@ -1,6 +1,6 @@
 defmodule Slax.Chat do
   alias Slax.Accounts.User
-  alias Slax.Chat.{Room, Message}
+  alias Slax.Chat.{Room, Message, RoomMembership}
   alias Slax.Repo
 
   import Ecto.Query
@@ -53,6 +53,11 @@ defmodule Slax.Chat do
     room
     |> Room.changeset(attrs)
     |> Repo.update()
+  end
+
+  @spec join_room!(Room.t(), User.t()) :: :ok
+  def join_room!(room, user) do
+    Repo.insert!(%RoomMembership{room: room, user: user})
   end
 
   ### Messages ###

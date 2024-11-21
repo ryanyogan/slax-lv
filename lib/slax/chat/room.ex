@@ -3,6 +3,8 @@ defmodule Slax.Chat.Room do
   import Ecto.Changeset
 
   alias Slax.Chat.Message
+  alias Slax.Accounts.User
+  alias Slax.Chat.{Message, RoomMembership}
 
   @type t :: %__MODULE__{
           __meta__: Ecto.Schema.Metadata.t(),
@@ -17,6 +19,7 @@ defmodule Slax.Chat.Room do
     field :name, :string
     field :topic, :string
 
+    many_to_many :members, User, join_through: RoomMembership
     has_many :messages, Message
 
     timestamps(type: :utc_datetime)
