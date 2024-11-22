@@ -31,9 +31,26 @@ defmodule Slax.Chat do
     Repo.get!(Room, id)
   end
 
+  def joined?(%Room{} = room, %User{} = user) do
+    Repo.exists?(
+      from rm in RoomMembership,
+        where:
+          rm.room_id ==
+            ^room.id and rm.user_id == ^user.id
+    )
+  end
+
   @spec list_rooms() :: [Room.t()]
   def list_rooms do
     Repo.all(from r in Room, order_by: [asc: :name])
+  end
+
+  @spec list_joined_rooms(User.t()) :: [Room.t()]
+  def list_joined_rooms(%User{} = user) do
+    user
+    |> Repo.preload(:rooms)
+    |> Map.fetch!(:rooms)
+    |> Enum.sort_by(& &1.name)
   end
 
   @spec change_room(Room.t(), map()) :: Ecto.Changeset.t()
