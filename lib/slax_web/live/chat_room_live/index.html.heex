@@ -30,6 +30,17 @@
             <% end %>
           </div>
         </div>
+        <button
+          class="opacity-0 group-hover:opacity-100 bg-white hover:bg-gray-100 border border-gray-400 text-gray-700 px-3 py-1.5 rounded-sm font-bold"
+          phx-click="toggle-room-membership"
+          phx-value-id={room.id}
+        >
+          <%= if joined? do %>
+            Leave
+          <% else %>
+            Join
+          <% end %>
+        </button>
       </div>
     </div>
   </div>
