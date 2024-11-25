@@ -9,7 +9,12 @@
       <span class="ml-2 leading-none font-medium text-sm">Rooms</span>
     </div>
     <div id="rooms-list">
-      <.room_link :for={room <- @rooms} room={room} active={room.id == @room.id} />
+      <.room_link
+        :for={{room, unread_count} <- @rooms}
+        room={room}
+        unread_count={unread_count}
+        active={room.id == @room.id}
+      />
       <button class="group relative flex items-center h-8 text-sm pl-8 pr-3 hover:bg-slate-300 cursor-pointer w-full">
         <.icon name="hero-plus" class="size-4 relative top-px" />
         <span class="leading-none ml-2">Add rooms</span>

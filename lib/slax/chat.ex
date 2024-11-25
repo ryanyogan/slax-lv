@@ -106,6 +106,19 @@ defmodule Slax.Chat do
     Repo.all(query)
   end
 
+  def list_joined_rooms_with_unread_counts(%User{} = user) do
+    from(room in Room,
+      join: membership in assoc(room, :memberships),
+      where: membership.user_id == ^user.id,
+      left_join: message in assoc(room, :messages),
+      on: message.id > membership.last_read_id,
+      group_by: room.id,
+      select: {room, count(message.id)},
+      order_by: [asc: room.name]
+    )
+    |> Repo.all()
+  end
+
   @spec change_room(Room.t(), map()) :: Ecto.Changeset.t()
   def change_room(room, attrs \\ %{}) do
     Room.changeset(room, attrs)

@@ -6,6 +6,7 @@ defmodule SlaxWeb.Components.RoomComponents do
 
   attr :active, :boolean, required: true
   attr :room, Room, required: true
+  attr :unread_count, :integer, required: true
 
   def room_link(assigns) do
     ~H"""
@@ -20,6 +21,7 @@ defmodule SlaxWeb.Components.RoomComponents do
       <span class={["ml-2 leading-none", @active && "font-bold"]}>
         <%= @room.name %>
       </span>
+      <.unread_message_counter count={@unread_count} />
     </.link>
     """
   end
@@ -41,7 +43,7 @@ defmodule SlaxWeb.Components.RoomComponents do
       >
         <.icon name="hero-trash" class="size-4" />
       </button>
-      <div class="size-10 rounded flex-shrink-0 bg-slate-300"></div>
+      <img class="size-10 rounded flex-shrink-0" src={~p"/images/one_ring.jpg"} />
       <div class="ml-2">
         <div class="-mt-1">
           <.link class="text-sm font-semibold hover:underline">
@@ -54,6 +56,19 @@ defmodule SlaxWeb.Components.RoomComponents do
         </div>
       </div>
     </div>
+    """
+  end
+
+  attr :count, :integer, required: true
+
+  defp unread_message_counter(assigns) do
+    ~H"""
+    <span
+      :if={@count > 0}
+      class="flex items-center justify-center bg-blue-500 rounded-full font-medium h-5 px-2 ml-auto text-xs text-white"
+    >
+      <%= @count %>
+    </span>
     """
   end
 

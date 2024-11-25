@@ -5,12 +5,12 @@ defmodule SlaxWeb.ChatRoomLive do
 
   alias Slax.Accounts
   alias Slax.Chat
-  alias Slax.Chat.Message
+  alias Slax.Chat.{Message, Room}
   alias SlaxWeb.OnlineUsers
 
   @impl true
   def mount(_params, _session, socket) do
-    rooms = Chat.list_joined_rooms(socket.assigns.current_user)
+    rooms = Chat.list_joined_rooms_with_unread_counts(socket.assigns.current_user)
     users = Accounts.list_users()
 
     timezone = get_connect_params(socket)["timezone"]
@@ -20,6 +20,8 @@ defmodule SlaxWeb.ChatRoomLive do
     end
 
     OnlineUsers.subscribe()
+
+    Enum.each(rooms, fn {chat, _} -> Chat.subscribe_to_room(chat) end)
 
     socket =
       socket
@@ -37,8 +39,6 @@ defmodule SlaxWeb.ChatRoomLive do
 
   @impl true
   def handle_params(params, _uri, socket) do
-    if socket.assigns[:room], do: Chat.unsubscribe_from_room(socket.assigns.room)
-
     room =
       case Map.fetch(params, "id") do
         {:ok, id} ->
@@ -47,8 +47,6 @@ defmodule SlaxWeb.ChatRoomLive do
         :error ->
           Chat.get_first_room!()
       end
-
-    Chat.subscribe_to_room(room)
 
     last_read_id = Chat.get_last_read_id(room, socket.assigns.current_user)
 
@@ -69,7 +67,18 @@ defmodule SlaxWeb.ChatRoomLive do
      )
      |> stream(:messages, messages, reset: true)
      |> assign_message_form(Chat.change_message(%Message{}))
-     |> push_event("scroll_messages_to_bottom", %{})}
+     |> push_event("scroll_messages_to_bottom", %{})
+     |> update(:rooms, fn rooms ->
+       room_id = room.id
+
+       Enum.map(rooms, fn
+         {%Room{id: ^room_id} = room, _} ->
+           {room, 0}
+
+         other ->
+           other
+       end)
+     end)}
   end
 
   defp maybe_insert_unread_marker(messages, nil), do: messages
@@ -132,7 +141,7 @@ defmodule SlaxWeb.ChatRoomLive do
       assign(
         socket,
         joined?: true,
-        rooms: Chat.list_joined_rooms(current_user)
+        rooms: Chat.list_joined_rooms_with_unread_counts(current_user)
       )
 
     {:noreply, socket}
@@ -140,14 +149,31 @@ defmodule SlaxWeb.ChatRoomLive do
 
   @impl true
   def handle_info({:new_message, message}, socket) do
-    if message.room_id == socket.assigns.room.id do
-      Chat.update_last_read_id(socket.assigns.room, socket.assigns.current_user)
-    end
+    room = socket.assigns.room
 
     socket =
-      socket
-      |> stream_insert(:messages, message)
-      |> push_event("scroll_messages_to_bottom", %{})
+      cond do
+        message.room_id == room.id ->
+          Chat.update_last_read_id(room, socket.assigns.current_user)
+
+          socket
+          |> stream_insert(:messages, message)
+          |> push_event("scroll_messages_to_bottom", %{})
+
+        message.user_id != socket.assigns.current_user.id ->
+          update(socket, :rooms, fn rooms ->
+            Enum.map(rooms, fn
+              {%Room{id: id} = room, count} when id == message.room_id ->
+                {room, count + 1}
+
+              other ->
+                other
+            end)
+          end)
+
+        true ->
+          socket
+      end
 
     {:noreply, socket}
   end

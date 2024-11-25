@@ -35,7 +35,8 @@ elrond = Accounts.get_user_by_email("elrond@fellowship.me")
 aragorn = Accounts.get_user_by_email("aragorn@fellowship.me")
 boromir = Accounts.get_user_by_email("boromir@fellowship.me")
 
-room = Repo.insert!(%Room{name: "council-of-elrond", topic: "What to do with this ring?"})
+room =
+  Repo.insert!(%Room{name: "council-of-elrond", topic: "What to do with this ring?"})
 
 for {user, message} <- [
       {elrond,
