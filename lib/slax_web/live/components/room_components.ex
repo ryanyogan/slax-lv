@@ -70,7 +70,7 @@ defmodule SlaxWeb.Components.RoomComponents do
       <div class="ml-2">
         <div class="-mt-1">
           <.link class="text-sm font-semibold hover:underline">
-            <span><%= username(@message.user) %></span>
+            <span><%= @message.user.username %></span>
           </.link>
           <span :if={@timezone} class="ml-1 text-xs text-gray-500">
             <%= message_timestamp(@message, @timezone) %>
@@ -108,7 +108,7 @@ defmodule SlaxWeb.Components.RoomComponents do
           <span class="size-2 rounded-full border-gray-500 border-2"></span>
         <% end %>
       </div>
-      <span class="ml-2 leading-none"><%= username(@user) %></span>
+      <span class="ml-2 leading-none"><%= @user.username %></span>
     </.link>
     """
   end
@@ -133,10 +133,6 @@ defmodule SlaxWeb.Components.RoomComponents do
       </span>
     </button>
     """
-  end
-
-  defp username(%User{} = user) do
-    user.email |> String.split("@") |> hd() |> String.capitalize()
   end
 
   defp message_timestamp(message, timezone) do
