@@ -2,6 +2,7 @@ defmodule SlaxWeb.ChatRoomLive.Edit do
   use SlaxWeb, :live_view
 
   alias Slax.Chat
+  import SlaxWeb.Components.RoomComponents
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
