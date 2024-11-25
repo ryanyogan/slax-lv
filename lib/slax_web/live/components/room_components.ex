@@ -90,7 +90,28 @@ defmodule SlaxWeb.Components.RoomComponents do
     """
   end
 
-  # TODO: Move this to a shared module
+  attr :dom_id, :string, required: true
+  attr :text, :string, required: true
+  attr :on_click, JS, required: true
+
+  def toggler(assigns) do
+    ~H"""
+    <button id={@dom_id} phx-click={@on_click} class="flex items-center flex-grow focus:outline-none">
+      <.icon name="hero-chevron-down" id={@dom_id <> "-chevron-down"} class="size-4" />
+      <.icon
+        id={@dom_id <> "-chevron-right"}
+        name="hero-chevron-right"
+        class="size-4"
+        style="display: none;"
+      />
+
+      <span class="ml-2 leading-none font-medium text-sm">
+        <%= @text %>
+      </span>
+    </button>
+    """
+  end
+
   defp username(%User{} = user) do
     user.email |> String.split("@") |> hd() |> String.capitalize()
   end
@@ -99,5 +120,17 @@ defmodule SlaxWeb.Components.RoomComponents do
     message.inserted_at
     |> Timex.Timezone.convert(timezone)
     |> Timex.format!("%-l:%M %p", :strftime)
+  end
+
+  def toggle_rooms() do
+    JS.toggle(to: "#rooms-toggler-chevron-down")
+    |> JS.toggle(to: "#rooms-toggler-chevron-right")
+    |> JS.toggle(to: "#rooms-list")
+  end
+
+  def toggle_users() do
+    JS.toggle(to: "#users-toggler-chevron-down")
+    |> JS.toggle(to: "#users-toggler-chevron-right")
+    |> JS.toggle(to: "#users-list")
   end
 end
