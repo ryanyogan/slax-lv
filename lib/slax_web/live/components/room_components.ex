@@ -1,8 +1,16 @@
 defmodule SlaxWeb.Components.RoomComponents do
-  use SlaxWeb, :live_component
+  use Phoenix.Component
+
+  use Phoenix.VerifiedRoutes,
+    endpoint: SlaxWeb.Endpoint,
+    router: SlaxWeb.Router,
+    statics: SlaxWeb.static_paths()
+
+  import SlaxWeb.CoreComponents
 
   alias Slax.Chat.{Room, Message}
   alias Slax.Accounts.User
+  alias Phoenix.LiveView.JS
 
   attr :active, :boolean, required: true
   attr :room, Room, required: true

@@ -119,7 +119,6 @@ defmodule Slax.Chat do
     |> Repo.all()
   end
 
-  @spec change_room(Room.t(), map()) :: Ecto.Changeset.t()
   def change_room(room, attrs \\ %{}) do
     Room.changeset(room, attrs)
   end
