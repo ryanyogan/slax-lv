@@ -26,7 +26,6 @@ defmodule SlaxWeb.ChatRoomLive do
     socket
     |> assign(rooms: rooms, timezone: timezone, users: users)
     |> assign(online_users: OnlineUsers.list())
-    |> assign_room_form(Chat.change_room(%Room{}))
     |> stream_configure(:messages,
       dom_id: fn
         %Message{id: id} -> "messages-#{id}"
@@ -35,10 +34,6 @@ defmodule SlaxWeb.ChatRoomLive do
       end
     )
     |> ok()
-  end
-
-  defp assign_room_form(socket, changeset) do
-    assign(socket, :new_room_form, to_form(changeset))
   end
 
   @impl true
@@ -131,16 +126,6 @@ defmodule SlaxWeb.ChatRoomLive do
   end
 
   @impl true
-  def handle_event("validate-room", %{"room" => room_params}, socket) do
-    changeset =
-      socket.assigns.room
-      |> Chat.change_room(room_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign_room_form(socket, changeset)}
-  end
-
-  @impl true
   def handle_event("submit-message", %{"message" => message_params}, socket) do
     %{current_user: current_user, room: room} = socket.assigns
 
@@ -158,22 +143,6 @@ defmodule SlaxWeb.ChatRoomLive do
       end
 
     {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event("save-room", %{"room" => room_params}, socket) do
-    case Chat.create_room(room_params) do
-      {:ok, room} ->
-        Chat.join_room!(room, socket.assigns.current_user)
-
-        {:noreply,
-         socket
-         |> put_flash(:info, "Created room")
-         |> push_navigate(to: ~p"/rooms/#{room}")}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_room_form(socket, changeset)}
-    end
   end
 
   @impl true
