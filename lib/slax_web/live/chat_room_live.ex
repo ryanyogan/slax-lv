@@ -168,6 +168,18 @@ defmodule SlaxWeb.ChatRoomLive do
   end
 
   @impl true
+  def handle_event("show-profile", %{"user-id" => user_id}, socket) do
+    user = Accounts.get_user!(user_id)
+
+    {:noreply, assign(socket, :profile, user)}
+  end
+
+  @impl true
+  def handle_event("close-profile", _unsigned_params, socket) do
+    {:noreply, assign(socket, :profile, nil)}
+  end
+
+  @impl true
   def handle_info({:new_message, message}, socket) do
     room = socket.assigns.room
 

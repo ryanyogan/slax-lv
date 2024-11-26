@@ -73,10 +73,19 @@ defmodule SlaxWeb.Components.RoomComponents do
       >
         <.icon name="hero-trash" class="size-4" />
       </button>
-      <img class="size-10 rounded flex-shrink-0" src={~p"/images/one_ring.jpg"} />
+      <img
+        class="size-10 rounded cursor-pointer"
+        phx-click="show-profile"
+        phx-value-user-id={@message.user.id}
+        src={~p"/images/one_ring.jpg"}
+      />
       <div class="ml-2">
         <div class="-mt-1">
-          <.link class="text-sm font-semibold hover:underline">
+          <.link
+            phx-click="show-profile"
+            phx-value-user-id={@message.user.id}
+            class="text-sm font-semibold hover:underline"
+          >
             <span><%= @message.user.username %></span>
           </.link>
           <span :if={@timezone} class="ml-1 text-xs text-gray-500">
