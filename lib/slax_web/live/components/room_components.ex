@@ -95,6 +95,31 @@ defmodule SlaxWeb.Components.RoomComponents do
     """
   end
 
+  def format_date(%Date{} = date) do
+    today = Date.utc_today()
+
+    case Date.diff(today, date) do
+      0 ->
+        "Today"
+
+      1 ->
+        "Yesterday"
+
+      _ ->
+        format_str = "%A, %B %e#{ordinal(date.day)}#{if today.year != date.year, do: " %Y"}"
+        Timex.format!(date, format_str, :strftime)
+    end
+  end
+
+  defp ordinal(day) do
+    cond do
+      rem(day, 10) == 1 and day != 11 -> "st"
+      rem(day, 10) == 2 and day != 12 -> "nd"
+      rem(day, 10) == 3 and day != 13 -> "rd"
+      true -> "th"
+    end
+  end
+
   attr :user, User, required: true
   attr :online, :boolean, default: false
 
